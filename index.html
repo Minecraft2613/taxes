@@ -90,7 +90,6 @@
     <div class="admin-tools" id="adminTools">
       <h3>🔧 Admin Tools</h3>
       <button onclick="refreshTaxData()">🔄 Refresh Tax Data</button>
-      
     </div>
 
     <script>
@@ -125,10 +124,6 @@
           document.querySelector('.container').appendChild(loginBtn);
         }
       }
-      }
-
-      
-      }
 
       function refreshTaxData() {
         if (confirm('Refresh tax data from the latest file? This will not delete payment history.')) {
@@ -138,44 +133,33 @@
       }
 
       async function nextStep() {
-  const version = document.getElementById('version').value;
-  const contact = document.getElementById('contact').value;
-  const mcid = document.getElementById('mcid').value.trim();
+        const version = document.getElementById('version').value;
+        const contact = document.getElementById('contact').value;
+        const mcid = document.getElementById('mcid').value.trim();
 
-  console.log("MCID:", mcid, "Version:", version, "Contact:", contact);
+        if (!mcid) {
+          alert('Please enter a Minecraft ID');
+          return;
+        }
 
-  if (!mcid) {
-    alert('Please enter a Minecraft ID');
-    return;
-  }
+        currentPlayer = mcid;
+        document.getElementById('step1').classList.add('hidden');
 
-  currentPlayer = mcid;
-  document.getElementById('step1').classList.add('hidden');
-
-  try {
-    await fetch('https://discordapp.com/api/webhooks/YOUR_WEBHOOK_URL', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        content: `📥 New Entry:
-Version: ${version}
-Contact: ${contact}
-Minecraft ID: ${mcid}`
-      })
-    });
-  } catch (e) {
-    console.warn("Webhook failed:", e);
-  }
-
-  loadTax();
-},
-          body: JSON.stringify({
-            content: `📥 New Entry:\nVersion: ${version}\nContact: ${contact}\nMinecraft ID: ${mcid}`
-          })
-        });
+        try {
+          await fetch('https://discordapp.com/api/webhooks/YOUR_WEBHOOK_URL', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              content: `📥 New Entry:\nVersion: ${version}\nContact: ${contact}\nMinecraft ID: ${mcid}`
+            })
+          });
+        } catch (e) {
+          console.warn("Webhook failed:", e);
+        }
 
         loadTax();
       }
+      window.nextStep = nextStep;
 
       async function loadTax() {
         const url = 'https://raw.githubusercontent.com/Minecraft2613/tax/main/transaction-log.txt';
@@ -207,13 +191,14 @@ Minecraft ID: ${mcid}`
         });
 
         const prevHash = localStorage.getItem('lastHash');
-const newHash = btoa(content);
-if (prevHash !== newHash) {
-  localStorage.setItem('taxLog', JSON.stringify(dailyTax));
-  localStorage.setItem('lastHash', newHash);
-} else {
-  console.log('No new transactions detected.');
-}
+        const newHash = btoa(content);
+        if (prevHash !== newHash) {
+          localStorage.setItem('taxLog', JSON.stringify(dailyTax));
+          localStorage.setItem('lastHash', newHash);
+        } else {
+          console.log('No new transactions detected.');
+        }
+
         playerData = taxRecords;
         renderProfile(currentPlayer);
       }
