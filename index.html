@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Player Tax System</title>
   <style>
     body {
@@ -59,7 +59,6 @@
     }
     .hidden { display: none; }
     .history-box { margin-top: 20px; background: #222; padding: 10px; border-radius: 8px; }
-    .reset-btn { background: crimson; color: white; margin-top: 20px; }
   </style>
 </head>
 <body>
@@ -80,10 +79,14 @@
       </select>
 
       <label for="mcid">Minecraft Username (ID):</label>
-      <input type="text" id="mcid" placeholder="e.g. Steve or steve.123">
+      <input type="text" id="mcid" placeholder="e.g. Steve or .Atharva">
 
       <button onclick="nextStep()">Next</button>
     </div>
+
+    <div id="profile" class="hidden"></div>
+  </div>
+
   <script>
     const paidPlayers = JSON.parse(localStorage.getItem('paidPlayers') || '{}');
     const paymentHistory = JSON.parse(localStorage.getItem('paymentHistory') || '{}');
@@ -124,7 +127,9 @@
       const dailyTax = {};
 
       lines.forEach(line => {
-        const match = line.match(/\[(.*?)\] - ([\w.]+) sold .*? for \$(\d+(?:,\d+)?(?:\.\d+)?)/);
+        if (!line.includes("sold")) return; // Ignore non-sale lines
+
+        const match = line.match(/\[(.*?)\]\s*-?\s*([\w.]+)\s+sold\s+.*?\s+for\s+\$(\d+(?:,\d+)?(?:\.\d+)?)/);
         if (match) {
           const date = match[1].split(' ')[0];
           const name = match[2];
@@ -167,33 +172,12 @@
             <button onclick="submitTax('${name}')">Pay Tax</button>
             <button onclick="advancePay('${name}')">Advance Pay</button>
             <button onclick="exitProfile()">Exit</button>
-            <button onclick="toggleDayTax('${name}')">View Per-Day Tax</button>
           </div>
           ${history}
-          <div id="dayTaxBox" class="history-box hidden"></div>
         </div>`;
 
       document.getElementById('profile').classList.remove('hidden');
       document.getElementById('profile').innerHTML = html;
-    }
-
-    function toggleDayTax(name) {
-      const box = document.getElementById('dayTaxBox');
-      if (box.classList.contains('hidden')) {
-        const logs = JSON.parse(localStorage.getItem('taxLog') || '{}');
-        let html = '<h3>Daily Tax</h3><ul>';
-        for (const date in logs) {
-          if (logs[date][name]) {
-            html += `<li>${date}: $${logs[date][name].toFixed(2)}</li>`;
-          }
-        }
-        html += '</ul>';
-        box.innerHTML = html;
-        box.classList.remove('hidden');
-      } else {
-        box.classList.add('hidden');
-        box.innerHTML = '';
-      }
     }
 
     function recordHistory(name, amt) {
