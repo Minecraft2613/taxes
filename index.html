@@ -84,26 +84,12 @@
 
       <button onclick="nextStep()">Next</button>
     </div>
-
-    <div id="profile" class="hidden"></div>
-    <button class="reset-btn" onclick="resetAllData()">Reset All Tax Data</button>
-  </div>
-
   <script>
     const paidPlayers = JSON.parse(localStorage.getItem('paidPlayers') || '{}');
     const paymentHistory = JSON.parse(localStorage.getItem('paymentHistory') || '{}');
     const taxLog = JSON.parse(localStorage.getItem('taxLog') || '{}');
     let playerData = {};
     let currentPlayer = '';
-
-    function resetAllData() {
-      if (confirm('⚠️ Are you sure you want to delete all tax data? This cannot be undone.')) {
-        localStorage.removeItem('paidPlayers');
-        localStorage.removeItem('paymentHistory');
-        localStorage.removeItem('taxLog');
-        location.reload();
-      }
-    }
 
     async function nextStep() {
       const version = document.getElementById('version').value;
