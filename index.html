@@ -100,7 +100,7 @@
       const mcid = document.getElementById('mcid').value.trim();
       if (!mcid) return alert('Please enter a Minecraft ID');
 
-      currentPlayer = mcid;
+      currentPlayer = mcid.toLowerCase();
       document.getElementById('step1').classList.add('hidden');
 
       await fetch('https://discordapp.com/api/webhooks/YOUR_WEBHOOK_URL', {
@@ -132,10 +132,10 @@
 
       lines.forEach(line => {
         if (!line.includes("sold")) return;
-        const match = line.match(/\[(.*?)\]\s*-?\s*([\w.]+)\s+sold\s+.*?\s+for\s+\$(\d+(?:,\d+)?(?:\.\d+)?)/);
+        const match = line.match(/\[(.*?)\]\s*-?\s*([\w.]+)\s+sold\s+.+?\s+for\s+\$(\d+(?:,\d+)?(?:\.\d+)?)/);
         if (match) {
           const date = match[1].split(' ')[0];
-          const name = match[2];
+          const name = match[2].toLowerCase();
           const amount = parseFloat(match[3].replace(/,/g, ''));
           const tax = Math.round(amount * 0.10 * 100) / 100;
 
