@@ -103,7 +103,7 @@
       currentPlayer = mcid;
       document.getElementById('step1').classList.add('hidden');
 
-      fetch('https://discordapp.com/api/webhooks/YOUR_WEBHOOK_URL', {
+      await fetch('https://discordapp.com/api/webhooks/YOUR_WEBHOOK_URL', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -116,9 +116,13 @@
 
     async function loadTax() {
       const url = 'https://raw.githubusercontent.com/Minecraft2613/tax/main/transaction-log.txt';
-      const res = await fetch(url);
-      const log = await res.text();
-      parseLog(log);
+      try {
+        const res = await fetch(url);
+        const log = await res.text();
+        parseLog(log);
+      } catch (err) {
+        alert('Failed to load transaction log');
+      }
     }
 
     function parseLog(content) {
@@ -127,8 +131,7 @@
       const dailyTax = {};
 
       lines.forEach(line => {
-        if (!line.includes("sold")) return; // Ignore non-sale lines
-
+        if (!line.includes("sold")) return;
         const match = line.match(/\[(.*?)\]\s*-?\s*([\w.]+)\s+sold\s+.*?\s+for\s+\$(\d+(?:,\d+)?(?:\.\d+)?)/);
         if (match) {
           const date = match[1].split(' ')[0];
@@ -176,8 +179,9 @@
           ${history}
         </div>`;
 
-      document.getElementById('profile').classList.remove('hidden');
-      document.getElementById('profile').innerHTML = html;
+      const profile = document.getElementById('profile');
+      profile.classList.remove('hidden');
+      profile.innerHTML = html;
     }
 
     function recordHistory(name, amt) {
